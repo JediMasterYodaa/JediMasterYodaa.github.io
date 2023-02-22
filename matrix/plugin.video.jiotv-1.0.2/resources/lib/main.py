@@ -13,8 +13,8 @@ from codequick.script import Settings
 from codequick.storage import PersistentDict
 
 # add-on imports
-from resources.lib.utils import getTokenParams, getHeaders, isLoggedIn, login as ULogin, logout as ULogout, check_addon, sendOTP, get_local_ip
-from resources.lib.constants import GET_CHANNEL_URL, PLAY_EX_URL, EXTRA_CHANNELS, GENRE_MAP, LANG_MAP, FEATURED_SRC, CONFIG, CHANNELS_SRC, IMG_CATCHUP, PLAY_URL, IMG_CATCHUP_SHOWS, CATCHUP_SRC, M3U_SRC, EPG_SRC, M3U_CHANNEL
+from resources.lib.utils import  getHeaders, isLoggedIn, login as ULogin, logout as ULogout, check_addon, sendOTP, get_local_ip
+from resources.lib.constants import GET_CHANNEL_URL, GENRE_MAP, LANG_MAP, FEATURED_SRC, CONFIG, CHANNELS_SRC, IMG_CATCHUP, PLAY_URL, IMG_CATCHUP_SHOWS, CATCHUP_SRC, M3U_SRC, EPG_SRC, M3U_CHANNEL
 
 # additional imports
 import urlquick
@@ -24,7 +24,6 @@ import json
 import m3u8
 from time import time, sleep
 from datetime import datetime, timedelta, date
-
 
 # Root path of plugin
 @Route.register
@@ -74,12 +73,11 @@ def show_featured(plugin, id=None):
                             "clearlogo": IMG_CATCHUP + child.get("logoUrl", ""),
                         },
                         "info": {
-                            'channel_name': child.get("channel_name"),
                             'originaltitle': child.get("showname"),
                             "tvshowtitle": child.get("showname"),
                             "genre": child.get("showGenre"),
-                            "plot": child.get("description"),
-                            "episodeguide": child.get("episode_desc"),
+                            "plot": child.get("episode_desc"),
+                            "episodeguide": child.get("description"),
                             "episode": 0 if child.get("episode_num") == -1 else child.get("episode_num"),
                             "cast": child.get("starCast", "").split(', '),
                             "director": child.get("director"),
@@ -93,9 +91,7 @@ def show_featured(plugin, id=None):
                             "showname", "") + " [COLOR red] [ LIVE ] [/COLOR]"
                         info_dict["callback"] = play
                         info_dict["params"] = {
-                            "channel_id": child.get("channel_id"),
-                            "srno":child.get("srno")
-                            }
+                            "channel_id": child.get("channel_id")}
                         yield Listitem.from_dict(**info_dict)
                     elif child.get("showStatus") == "future":
                         timetext = datetime.fromtimestamp(int(child.get("startEpoch", 0)*.001)).strftime(
@@ -113,12 +109,15 @@ def show_featured(plugin, id=None):
                         info_dict["params"] = {
                             "channel_id": child.get("channel_id"),
                             "showtime": child.get("showtime", "").replace(":", ""),
-                            "srno":child.get("srno")
+                            "srno": datetime.fromtimestamp(int(child.get("startEpoch", 0)*.001)).strftime('%Y%m%d'),
+                            "programId":  child.get("srno", ""),
+                            "begin":  datetime.fromtimestamp(int(child.get("startEpoch", 0)*.001)).strftime('%Y%m%dT%H%M%S'),
+                            "end":  datetime.fromtimestamp(int(child.get("endEpoch", 0)*.001)).strftime('%Y%m%dT%H%M%S'),
                         }
                         yield Listitem.from_dict(**info_dict)
         else:
             yield Listitem.from_dict(**{
-                "label": each.get("name"),
+                "label": each.get("showname"),
                 "art": {
                     "thumb": IMG_CATCHUP_SHOWS + each.get("data", [{}])[0].get("episodePoster"),
                     "icon": IMG_CATCHUP_SHOWS + each.get("data", [{}])[0].get("episodePoster"),
@@ -171,8 +170,7 @@ def show_category(plugin, category_id, by):
             },
             "callback": play,
             "params": {
-                "channel_id": each.get("channel_id"),
-                "srno":each.get("srno")
+                "channel_id": each.get("channel_id")
             }
         })
         if each.get("isCatchupAvailable"):
@@ -204,13 +202,12 @@ def show_epg(plugin, day, channel_id):
             },
             "callback": play,
             "info": {
-                'channelname': each['channel_name'],
                 'title': each['showname'] + showtime,
                 'originaltitle': each['showname'],
                 "tvshowtitle": each['showname'],
                 'genre': each['showGenre'],
-                'plot': each['description'],
-                "episodeguide": each.get("episode_desc"),
+                "plot": each.get("episode_desc"),
+                "episodeguide": each.get("description"),
                 'episode': 0 if each['episode_num'] == -1 else each['episode_num'],
                 'cast': each['starCast'].split(', '),
                 'director': each['director'],
@@ -221,7 +218,10 @@ def show_epg(plugin, day, channel_id):
             "params": {
                 "channel_id": each.get("channel_id"),
                 "showtime": None if islive else each.get("showtime", "").replace(":", ""),
-                "srno":each.get("srno")
+                "srno": None if islive else datetime.fromtimestamp(int(each.get("startEpoch", 0)*.001)).strftime('%Y%m%d'),
+                "programId": None if islive else each.get("srno", ""),
+                "begin": None if islive else datetime.fromtimestamp(int(each.get("startEpoch", 0)*.001)).strftime('%Y%m%dT%H%M%S'),
+                "end": None if islive else datetime.fromtimestamp(int(each.get("endEpoch", 0)*.001)).strftime('%Y%m%dT%H%M%S'),
             }
         })
     if int(day) == 0:
@@ -238,61 +238,50 @@ def show_epg(plugin, day, channel_id):
             })
 
 
-@Resolver.register
-@isLoggedIn
-def play_ex(plugin, dt=None):
-    is_helper = inputstreamhelper.Helper(
-        dt.get("proto", "mpd"), drm=dt.get("drm"))
-    if is_helper.check_inputstream():
-        licenseUrl = dt.get("lUrl") and dt.get("lUrl").replace("{HEADERS}", urlencode(
-            getHeaders())).replace("{TOKEN}", urlencode(getTokenParams()))
-        art = {}
-        if dt.get("default_logo"):
-            art['thumb'] = art['icon'] = IMG_CATCHUP + \
-                dt.get("default_logo")
-        return Listitem().from_dict(**{
-            "label": dt.get("label") or plugin._title,
-            "art": art or None,
-            "callback": dt.get("pUrl"),
-            "properties": {
-                "IsPlayable": True,
-                "inputstream": is_helper.inputstream_addon,
-                "inputstream.adaptive.stream_headers": dt.get("hdrs"),
-                "inputstream.adaptive.manifest_type": dt.get("proto", "mpd"),
-                "inputstream.adaptive.license_type": dt.get("drm"),
-                "inputstream.adaptive.license_key": licenseUrl,
-            }
-        })
-
-
 # Play live stream/ catchup according to params.
 # Also insures that user is logged in.
 @Resolver.register
 @isLoggedIn
-def play(plugin, channel_id,srno=None, showtime=None,):
+def play(plugin, channel_id, showtime=None, srno=None , programId=None, begin=None, end=None):
     is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
     hasIs = is_helper.check_inputstream()
     if not hasIs:
         return
     
-
     rjson = {
-        "channelId": int(channel_id),
         "channel_id": int(channel_id),
         "stream_type": "Seek",
-        "srno":srno
     }
     if showtime and srno:
         rjson["showtime"] = showtime
         rjson["srno"] = srno
         rjson["stream_type"] = "Catchup"
+        rjson["programId"] = programId
+        rjson["begin"] = begin
+        rjson["end"] = end
 
-    resp = urlquick.post(GET_CHANNEL_URL, json=rjson, headers=getHeaders(), max_age=-1).json()
+    getUrlHeaders = {
+        "devicetype":"phone",
+        "host":"tv.media.jio.com",
+        "os":"android",
+        "versioncode":"290",
+        "Content-Type":"application/json",
+        "channel_id":str(channel_id),
+        "srno":rjson["srno"] if "srno" in rjson else str(None)
+    }
+
+    headers = getHeaders()
+    headers['channelid'] = str(channel_id)
+    headers['srno'] = rjson["srno"] if "srno" in rjson else str(None)
+    resp = urlquick.post(GET_CHANNEL_URL, json=rjson, headers=getUrlHeaders, max_age=-1).json()
     art = {}
     art["thumb"] = art["icon"] = IMG_CATCHUP + \
         resp.get("result", "").split("/")[-1].replace(".m3u8", ".png")
-    uriToUse = resp.get("result","")
+    quality = Settings.get_string("quality")
+    bitrates = resp.get("bitrates","")
+    uriToUse = bitrates.get(str(quality),"")
     link,cookie = uriToUse.split("?")
+    cookie = "__hdnea__"+resp.get("result", "").split("__hdnea__")[-1]
     extraWord = link.split('/')[-1]
     link = link.split(extraWord)[0]
     headers = getHeaders()
@@ -304,14 +293,19 @@ def play(plugin, channel_id,srno=None, showtime=None,):
         })
     
 
-    print(headers)
-    # uriToUse = resp.get("result","")
     variants = urlquick.get(uriToUse, headers=headers, max_age=-1).text
     variant_m3u8 = m3u8.loads(variants)
     if variant_m3u8.is_variant:
-        # quality = len(variant_m3u8.playlists) - 1
-        quality = 2
-        uriToUse = uriToUse.replace(extraWord, variant_m3u8.playlists[quality].uri)
+        quality = 1
+        if showtime and srno:
+            tmpurl = variant_m3u8.playlists[quality].uri
+            if "?" in tmpurl:
+                uriToUse = uriToUse.split("?")[0].replace(extraWord, tmpurl)
+            else:
+                uriToUse = uriToUse.replace(extraWord, tmpurl.split("?")[0])
+        else:
+            uriToUse = uriToUse.replace(extraWord, variant_m3u8.playlists[quality].uri)
+    
          
     return Listitem().from_dict(**{
         "label": plugin._title,
@@ -383,7 +377,7 @@ def m3ugen(plugin, notify="yes"):
             "channel_id={0}".format(channel.get("channel_id"))
         catchup = ""
         if channel.get("isCatchupAvailable"):
-            catchup = ' catchup="vod" catchup-source="{0}channel_id={1}&showtime={{H}}{{M}}{{S}}&srno={{Y}}{{m}}{{d}}" catchup-days="7"'.format(
+            catchup = ' catchup="vod" catchup-source="{0}channel_id={1}&showtime={{H}}{{M}}{{S}}&srno={{Y}}{{m}}{{d}}&programId={{catchup-id}}" catchup-days="7"'.format(
                 PLAY_URL, channel.get("channel_id"))
         m3ustr += M3U_CHANNEL.format(
             tvg_id=channel.get("channel_id"),

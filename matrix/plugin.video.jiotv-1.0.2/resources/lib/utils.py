@@ -91,7 +91,7 @@ def login(username, password, mode="unpw"):
         headers = {
             "appkey": "NzNiMDhlYzQyNjJm",
             "accesstoken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImF1dGhUb2tlbklkIjoiYmQwMmFlMzUtZjc3NS00NjBhLTk4OTYtYjUzY2E3ZmNmMDI3IiwidXNlcklkIjoiODcxMmY2NzgtNzE4MS00MTIxLWEyZmUtMTRmMmUzNTRlZTNmIiwidXNlclR5cGUiOiJKSU8iLCJvcyI6ImFuZHJvaWQiLCJkZXZpY2VUeXBlIjoicGhvbmUiLCJhY2Nlc3NMZXZlbCI6IjkiLCJkZXZpY2VJZCI6IjcwYTZhM2ExMTc2ZGMxMGQiLCJleHRyYSI6IntcIm51bWJlclwiOlwiOFNMQ0J5Q1h2NEFjb0cyMG85MUtiQm03aWRYOGtJSmlRa1FiS3B6dFJ0WU9jbFRtSXc3Uk9hUT1cIixcInBsYW5kZXRhaWxzXCI6e1wiUGFja2FnZUluZm9cIjpbe1wicGxhbmlkXCI6XCIxXCIsXCJzdWJzY3JpcHRpb25zdGFydFwiOjE2NTkwMjI0NDcsXCJzdWJzY3JpcHRpb25lbmRcIjoxNjkwNTU4NDQ3LFwicGxhbnR5cGVcIjpcInByZW1pdW1cIixcImJ1c2luZXNzVHlwZVwiOlwiamlvXCIsXCJpc2FjdGl2ZVwiOnRydWUsXCJub3Rlc1wiOlwiXCJ9XX19Iiwic3Vic2NyaWJlcklkIjoiMTE0MzAzNTMyMSJ9LCJleHAiOjE2NzUwMjI1NTksImlhdCI6MTY3NTAxNTM1OX0.uja0tHTRGSzsEssNEq08JOJyL-Q8C3la9wZQGlapH7DWxvnXq6nzKWGnyRiCMEjcp1V0WSbICSOA_aeN0dxR8w",
-            "os": "Android",
+            "os": "android",
             "deviceId": str(uuid4()),
             "devicetype": "phone",
             "lbcookie": "1",
@@ -139,14 +139,6 @@ def logout():
 def getHeaders():
     with PersistentDict("headers") as db:
         return db.get("headers", False)
-
-
-def getTokenParams():
-    def magic(x): return base64.b64encode(hashlib.md5(x.encode()).digest()).decode().replace(
-        '=', '').replace('+', '-').replace('/', '_').replace('\r', '').replace('\n', '')
-    pxe = str(int(time.time()+(3600*9.2)))
-    jct = magic("cutibeau2ic9p-O_v1qIyd6E-rf8_gEOQ"+pxe)
-    return {"jct": jct, "pxe": pxe, "st": "9p-O_v1qIyd6E-rf8_gEOQ"}
 
 
 def check_addon(addonid, minVersion=False):
