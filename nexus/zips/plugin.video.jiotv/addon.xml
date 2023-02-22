@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.jiotv" name="JioTV" version="1.0.3" provider-name="yoda">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.codequick" version="1.0.2"/>
+        <import addon="script.module.inputstreamhelper" version="0.5.10"/>
+        <import addon="inputstream.adaptive" minversion="2.6.6"/>
+        <import addon="repository.yoda" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Stream Live Indian Channels From JioTV on Kodi</summary>
+        <description lang="en_GB">Enjoy Live TV experience in Kodi.</description>
+        <language>en</language>
+        <platform>all</platform>
+        <license>MIT</license>
+        <forum></forum>
+        <website>https://JediMasterYodaa.github.io</website>
+        <email></email>
+        <source>https://github.com/Geletinousamigo/plugin.video.jiotv</source>
+        <news>
+[- 1.0.3 -]
+[added] Support for Inputstream Adaptive 20.0.3 
+[added] Fixed Catchup
+
+[- 1.0.2 -]
+[fixed] Bugs related to playback
+[added] Login with OTP
+
+[- 1.0.1 -]
+
+[added] Kodi Matrix support
+[added] Star channels support
+
+[- 1.0.0 -]
+
+[added] Featured Content
+
+        </news>
+        <disclaimer>This plugin is not officially commissioned/supported by Jio. The trademark "Jio" is registered by "Reliance Corporate IT Park Limited (RCITPL)"</disclaimer>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.png</fanart>
+            <screenshot>resources/screenshots/screenshot000.png</screenshot>
+            <screenshot>resources/screenshots/screenshot001.png</screenshot>
+            <screenshot>resources/screenshots/screenshot002.png</screenshot>
+        </assets>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+    </extension>
+</addon>
