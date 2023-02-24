@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="plugin.video.jiotv" name="JioTV" version="1.0.2" provider-name="yoda">
+<addons><addon id="plugin.video.jiotv" name="JioTV" version="1.0.3" provider-name="yoda">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.codequick" version="1.0.2" />
@@ -23,6 +23,9 @@
         <email>kodi@botallen.com</email>
         <source>https://github.com/Geletinousamigo/plugin.video.jiotv</source>
         <news>
+
+[- 1.0.3 -]
+[added] OTP login, which includes AuthToken, RefreshToken in the resp 
 
 [- 1.0.2 -]
 [fixed] Bugs related to playback

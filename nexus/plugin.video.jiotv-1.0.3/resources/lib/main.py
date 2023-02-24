@@ -204,10 +204,10 @@ def show_epg(plugin, day, channel_id):
             "info": {
                 'title': each['showname'] + showtime,
                 'originaltitle': each['showname'],
-                "tvshowtitle": each['showname'],
+                'tvshowtitle': each['showname'],
                 'genre': each['showGenre'],
-                "plot": each.get("episode_desc"),
-                "episodeguide": each.get("description"),
+                'plot': each.get("episode_desc"),
+                'episodeguide': each.get("description"),
                 'episode': 0 if each['episode_num'] == -1 else each['episode_num'],
                 'cast': each['starCast'].split(', '),
                 'director': each['director'],

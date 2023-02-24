@@ -73,11 +73,11 @@ def show_featured(plugin, id=None):
                             "clearlogo": IMG_CATCHUP + child.get("logoUrl", ""),
                         },
                         "info": {
-                            'originaltitle': child.get("showname"),
+                            "originaltitle": child.get("showname"),
                             "tvshowtitle": child.get("showname"),
                             "genre": child.get("showGenre"),
-                            "plot": child.get("episode_desc"),
-                            "episodeguide": child.get("description"),
+                            "episodeguide": child.get("episode_desc"),
+                            "plot": child.get("description"),
                             "episode": 0 if child.get("episode_num") == -1 else child.get("episode_num"),
                             "cast": child.get("starCast", "").split(', '),
                             "director": child.get("director"),
@@ -204,10 +204,10 @@ def show_epg(plugin, day, channel_id):
             "info": {
                 'title': each['showname'] + showtime,
                 'originaltitle': each['showname'],
-                "tvshowtitle": each['showname'],
+                'tvshowtitle': each['showname'],
                 'genre': each['showGenre'],
-                "plot": each.get("episode_desc"),
-                "episodeguide": each.get("description"),
+                'episodeguide': each.get("episode_desc"),
+                'plot': each.get("description"),
                 'episode': 0 if each['episode_num'] == -1 else each['episode_num'],
                 'cast': each['starCast'].split(', '),
                 'director': each['director'],
@@ -289,14 +289,13 @@ def play(plugin, channel_id, showtime=None, srno=None , programId=None, begin=No
         "cookie":cookie,
         "channelid":str(channel_id),
         "srno":str(srno),
-        "accesstoken":"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImF1dGhUb2tlbklkIjoiMjM0ZGJiZTEtMTc4Zi00Yzc3LTg0NjQtNmM5Y2Y0ZmI1M2U5IiwidXNlcklkIjoiODcxMmY2NzgtNzE4MS00MTIxLWEyZmUtMTRmMmUzNTRlZTNmIiwidXNlclR5cGUiOiJKSU8iLCJvcyI6ImFuZHJvaWQiLCJkZXZpY2VUeXBlIjoicGhvbmUiLCJhY2Nlc3NMZXZlbCI6IjkiLCJkZXZpY2VJZCI6IjcwYTZhM2ExMTc2ZGMxMGQiLCJleHRyYSI6IntcIm51bWJlclwiOlwiTzByNzQxaEttNGtqSUdkclJ6V2JVbFY5Z1dNTmx4UXYxRWNkUTQ1cjhERU9XNDRMWm5XVVhYYz1cIixcInBsYW5kZXRhaWxzXCI6e1wiUGFja2FnZUluZm9cIjpbe1wicGxhbmlkXCI6XCIxXCIsXCJzdWJzY3JpcHRpb25zdGFydFwiOjE2NTkwMjI0NDcsXCJzdWJzY3JpcHRpb25lbmRcIjoxNjkwNTU4NDQ3LFwicGxhbnR5cGVcIjpcInByZW1pdW1cIixcImJ1c2luZXNzVHlwZVwiOlwiamlvXCIsXCJpc2FjdGl2ZVwiOnRydWUsXCJub3Rlc1wiOlwiXCJ9XX19Iiwic3Vic2NyaWJlcklkIjoiMTE0MzAzNTMyMSJ9LCJleHAiOjE2NzUxMDE3MjgsImlhdCI6MTY3NTA5NDUyOH0.sqzNDydvNz15OrSpe-zBJt0D7K86wOy8NZffb8cgT-YE2NlljddA9mZ5WFI_S4-jpDRNszd4PEVUFdbCGy2TYQ"
         })
     
 
     variants = urlquick.get(uriToUse, headers=headers, max_age=-1).text
     variant_m3u8 = m3u8.loads(variants)
     if variant_m3u8.is_variant:
-        quality = 1
+        quality = 0
         if showtime and srno:
             tmpurl = variant_m3u8.playlists[quality].uri
             if "?" in tmpurl:

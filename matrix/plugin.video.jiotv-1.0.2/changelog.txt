@@ -1,3 +1,7 @@
+[- 1.0.3 -]
+Added OTP Login Feature(which includes AuthToken,refreshToken), removed deprecated Username/Password login
+
+
 [- 1.0.2 -]
 
 Bugs related to playback
